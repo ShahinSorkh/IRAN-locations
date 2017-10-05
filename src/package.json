@@ -1,0 +1,16 @@
+{
+  "name": "IRAN-locations",
+  "version": "1.0.0",
+  "description": "IRAN provinces, cities and areas",
+  "repository": "https://github.com/ShahinSorkh/IRAN-locations.git",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard --fix && echo 'done'"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^10.0.3"
+  }
+}
