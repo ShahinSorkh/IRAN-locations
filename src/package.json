@@ -5,6 +5,7 @@
   "repository": "https://github.com/ShahinSorkh/IRAN-locations.git",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "standard --fix && echo 'done'"
   },
   "author": "",
