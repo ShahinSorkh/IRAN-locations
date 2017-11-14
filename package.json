@@ -8,7 +8,7 @@
     "start": "node src/index.js",
     "test": "standard --fix && echo 'done'"
   },
-  "author": "",
+  "author": "Shahin Sorkh <sorkh.shahin@hotmail.com>",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
