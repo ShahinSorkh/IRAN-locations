@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-let data = JSON.parse(fs.readFileSync('data.json', {encoding: 'utf8'}))
+let data = JSON.parse(fs.readFileSync('data.json', { encoding: 'utf8' }))
 let provinces = data.provinces
 
 let provincesql = []
