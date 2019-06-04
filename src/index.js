@@ -1,6 +1,7 @@
+const path = require('path')
 const fs = require('fs')
 
-let data = JSON.parse(fs.readFileSync('data.json', { encoding: 'utf8' }))
+let data = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'data.json'), { encoding: 'utf8' }))
 let provinces = data.provinces
 
 let provincesql = []
@@ -8,13 +9,13 @@ let citysql = []
 let areasql = []
 
 for (let province of provinces) {
-  provincesql.push('(\'' + province.id + '\',\'' + province.name + '\')')
+  provincesql.push(`('${province.id}', '${province.name}')`)
   if (province.cities.length > 0) {
     for (let city of province.cities) {
-      citysql.push('(' + city.id + ',\'' + province.id + '\',\'' + city.name + '\')')
+      citysql.push(`(${city.id}, '${province.id}', '${city.name}')`)
       if (city.areas.length > 0) {
         for (let area of city.areas) {
-          areasql.push('(' + area.id + ',' + city.id + ',\'' + area.name + '\')')
+          areasql.push(`(${area.id}, ${city.id}, '${area.name}')`)
         }
       }
     }
@@ -47,9 +48,8 @@ sql += '         ON DELETE CASCADE\n'
 sql += '         ON UPDATE CASCADE\n'
 sql += ');\n\n'
 
-sql += 'INSERT INTO provinces (id,name) VALUES ' + provincesql.join(',\n') + ';\n\n'
-sql += 'INSERT INTO cities (id,province_id,name) VALUES ' + citysql.join(',\n') + ';\n\n'
-sql += 'INSERT INTO areas (id,city_id,name) VALUES ' + areasql.join(',\n') + ';\n\n'
+sql += `INSERT INTO provinces (id,name) VALUES ${provincesql.join(',\n')};\n\n`
+sql += `INSERT INTO cities (id,province_id,name) VALUES ${citysql.join(',\n')};\n\n`
+sql += `INSERT INTO areas (id,city_id,name) VALUES ${areasql.join(',\n')};\n\n`
 
-fs.writeFileSync('../dist/provinces.cities.areas.sql', sql)
-console.log('done')
+fs.writeFileSync(path.resolve(__dirname, '..', 'dist', 'provinces.cities.areas.sql'), sql)

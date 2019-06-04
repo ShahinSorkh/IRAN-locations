@@ -3,16 +3,19 @@
   "version": "1.0.1",
   "description": "IRAN provinces, cities and areas",
   "repository": "https://github.com/ShahinSorkh/IRAN-locations.git",
-  "main": "src/index.js",
+  "main": "dist/data.json",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "standard --fix && echo 'done'"
+    "build": "node src/index.js",
+    "test": "eslint --ext js --fix src"
   },
   "author": "Shahin Sorkh <sorkh.shahin@hotmail.com>",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0"
   }
 }
