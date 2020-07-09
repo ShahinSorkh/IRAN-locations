@@ -1,20 +1,20 @@
 const path = require('path')
 const fs = require('fs')
 
-let data = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'data.json'), { encoding: 'utf8' }))
-let provinces = data.provinces
+const data = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'data.json'), { encoding: 'utf8' }))
+const provinces = data.provinces
 
-let provincesql = []
-let citysql = []
-let areasql = []
+const provincesql = []
+const citysql = []
+const areasql = []
 
-for (let province of provinces) {
+for (const province of provinces) {
   provincesql.push(`('${province.id}', '${province.name}')`)
   if (province.cities.length > 0) {
-    for (let city of province.cities) {
+    for (const city of province.cities) {
       citysql.push(`(${city.id}, '${province.id}', '${city.name}')`)
       if (city.areas.length > 0) {
-        for (let area of city.areas) {
+        for (const area of city.areas) {
           areasql.push(`(${area.id}, ${city.id}, '${area.name}')`)
         }
       }
