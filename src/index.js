@@ -1,7 +1,8 @@
 const path = require('path')
 const fs = require('fs')
 
-const data = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'data.json'), { encoding: 'utf8' }))
+const dataFilename = path.resolve(__dirname, '..', 'dist', 'data.json')
+const data = JSON.parse(fs.readFileSync(dataFilename, { encoding: 'utf8' }))
 const provinces = data.provinces
 
 const provincesql = []
@@ -52,4 +53,5 @@ sql += `INSERT INTO provinces (id,name) VALUES ${provincesql.join(',\n')};\n\n`
 sql += `INSERT INTO cities (id,province_id,name) VALUES ${citysql.join(',\n')};\n\n`
 sql += `INSERT INTO areas (id,city_id,name) VALUES ${areasql.join(',\n')};\n\n`
 
-fs.writeFileSync(path.resolve(__dirname, '..', 'dist', 'provinces.cities.areas.sql'), sql)
+const sqlFilename = path.resolve(__dirname, '..', 'dist', 'provinces.cities.areas.sql')
+fs.writeFileSync(sqlFilename, sql)
