@@ -5,17 +5,19 @@
   "repository": "https://github.com/ShahinSorkh/IRAN-locations.git",
   "main": "dist/data.json",
   "scripts": {
-    "build": "node src/index.js",
+    "start": "node src/index.js",
     "test": "eslint --ext js --fix src"
   },
   "author": "Shahin Sorkh <sorkh.shahin@hotmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^7.4.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "eslint": "^8.31.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "dependencies": {
+    "sqlstring": "^2.3.3"
   }
 }
