@@ -1,6 +1,6 @@
 {
   "name": "iran-locations",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "IRAN provinces, cities and areas",
   "repository": "https://github.com/ShahinSorkh/IRAN-locations.git",
   "main": "dist/data.json",
