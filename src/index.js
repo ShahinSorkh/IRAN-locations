@@ -1,57 +1,65 @@
 const path = require('path')
 const fs = require('fs')
+const { escapeId, format } = require('sqlstring')
+
+const notEmpty = arr => arr.length > 0
 
 const dataFilename = path.resolve(__dirname, '..', 'dist', 'data.json')
-const data = JSON.parse(fs.readFileSync(dataFilename, { encoding: 'utf8' }))
-const provinces = data.provinces
+const { provinces } = JSON.parse(fs.readFileSync(dataFilename, { encoding: 'utf8' }))
 
-const provincesql = []
-const citysql = []
-const areasql = []
+const [provincesTable, citiesTable, areasTable] = [
+  escapeId('provinces'),
+  escapeId('cities'),
+  escapeId('areas')
+]
 
-for (const province of provinces) {
-  provincesql.push(`('${province.id}', '${province.name}')`)
-  if (province.cities.length > 0) {
-    for (const city of province.cities) {
-      citysql.push(`(${city.id}, '${province.id}', '${city.name}')`)
-      if (city.areas.length > 0) {
-        for (const area of city.areas) {
-          areasql.push(`(${area.id}, ${city.id}, '${area.name}')`)
-        }
-      }
-    }
-  }
-}
+const provinceObjs = provinces.flatMap(p => ([[p.id, p.name]]))
+const cityObjs = provinces.flatMap(p => p.cities.map(c => ([Number(c.id), c.name, p.id])).filter(notEmpty)).filter(notEmpty)
+const areaObjs = provinces.flatMap(
+  p => p.cities.flatMap(c => c.areas.map(a => ([Number(a.id), a.name, Number(c.id)])).filter(notEmpty)).filter(notEmpty)
+).filter(notEmpty)
 
-let sql = ''
+const createSchemaSql = `
+CREATE TABLE IF NOT EXISTS ${provincesTable} (
+    ${escapeId('id')} CHAR(3) PRIMARY KEY,
+    ${escapeId('name')} VARCHAR(150) NOT NULL
+);
 
-sql += 'CREATE TABLE IF NOT EXISTS provinces (\n'
-sql += '    id VARCHAR(3) PRIMARY KEY,\n'
-sql += '    name VARCHAR(150) NOT NULL\n'
-sql += ');\n\n'
+CREATE TABLE IF NOT EXISTS ${citiesTable} (
+    ${escapeId('id')} INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    ${escapeId('province_id')} CHAR(3) NOT NULL,
+    ${escapeId('name')} VARCHAR(150) NOT NULL,
+    FOREIGN KEY (${escapeId('province_id')}) REFERENCES ${escapeId('provinces')}(${escapeId('id')})
+         ON DELETE CASCADE
+         ON UPDATE CASCADE
+);
 
-sql += 'CREATE TABLE IF NOT EXISTS cities (\n'
-sql += '    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,\n'
-sql += '    province_id VARCHAR(3) NOT NULL,\n'
-sql += '    name VARCHAR(150) NOT NULL,\n'
-sql += '    FOREIGN KEY (province_id) REFERENCES provinces(id)\n'
-sql += '         ON DELETE CASCADE\n'
-sql += '         ON UPDATE CASCADE\n'
-sql += ');\n\n'
+CREATE TABLE IF NOT EXISTS ${areasTable} (
+    ${escapeId('id')} INT UNSIGNED,
+    ${escapeId('city_id')} INT UNSIGNED NOT NULL,
+    ${escapeId('name')} VARCHAR(150) NOT NULL,
+    PRIMARY KEY (${escapeId('id')}, ${escapeId('city_id')}),
+    FOREIGN KEY (${escapeId('city_id')}) REFERENCES ${escapeId('cities')}(${escapeId('id')})
+         ON DELETE CASCADE
+         ON UPDATE CASCADE
+);
+`
 
-sql += 'CREATE TABLE IF NOT EXISTS areas (\n'
-sql += '    id INT UNSIGNED,\n'
-sql += '    city_id INT UNSIGNED NOT NULL,\n'
-sql += '    name VARCHAR(150) NOT NULL,\n'
-sql += '    PRIMARY KEY (id, city_id),\n'
-sql += '    FOREIGN KEY (city_id) REFERENCES cities(id)\n'
-sql += '         ON DELETE CASCADE\n'
-sql += '         ON UPDATE CASCADE\n'
-sql += ');\n\n'
-
-sql += `INSERT INTO provinces (id,name) VALUES ${provincesql.join(',\n')};\n\n`
-sql += `INSERT INTO cities (id,province_id,name) VALUES ${citysql.join(',\n')};\n\n`
-sql += `INSERT INTO areas (id,city_id,name) VALUES ${areasql.join(',\n')};\n\n`
+const insertProvincesSql = format(
+  `INSRET INTO ${provincesTable} (${escapeId('id')}, ${escapeId('name')}) VALUES ?;`,
+  [provinceObjs]
+)
+const insertCitiesSql = format(
+  `INSRET INTO ${citiesTable} (${escapeId('id')}, ${escapeId('name')}, ${escapeId('province_id')}) VALUES ?;`,
+  [cityObjs]
+)
+const insertAreasSql = format(
+  `INSRET INTO ${areasTable} (${escapeId('id')}, ${escapeId('name')}, ${escapeId('city_id')}) VALUES ?;`,
+  [areaObjs]
+)
 
 const sqlFilename = path.resolve(__dirname, '..', 'dist', 'provinces.cities.areas.sql')
-fs.writeFileSync(sqlFilename, sql)
+fs.writeFileSync(
+  sqlFilename,
+  `${createSchemaSql}\n\n${insertProvincesSql}\n${insertCitiesSql}\n${insertAreasSql}`
+)
